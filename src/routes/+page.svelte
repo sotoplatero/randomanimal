@@ -13,7 +13,7 @@
   description="Discover random animals from various taxonomies and regions. Learn about different species with our interactive animal viewer."
 />
 
-<h1 class="text-3xl font-bold mb-4 text-center">Welcome to Animal Explorer</h1>
+<h1 class="text-3xl font-bold mb-4 text-center">Random Animal Generator</h1>
 
 <AnimalDisplay />
 
