@@ -91,7 +91,7 @@
           <p class="text-red-500">Error: {error}</p>
         </div>
       {:else if animal}
-        <h3 class="absolute bottom-0 left-0 right-0 text-4xl font-semibold py-4 px-8 bg-white bg-opacity-75 text-center flex items-center justify-center">
+        <h3 class="absolute bottom-0 left-0 right-0 text-2xl md:text-4xl font-semibold py-4 px-8 bg-white bg-opacity-75 text-center flex items-center justify-center">
           <span>{animal.taxon?.preferred_common_name || animal.taxon?.name || 'Unknown species'}</span>
         </h3>
         <img 
