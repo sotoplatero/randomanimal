@@ -10,6 +10,6 @@ export const iconicTaxa = [
 ];
 
 export function getTaxonEmoji(taxonName: string): string {
-  const taxon = iconicTaxa.find(t => t.name === taxonName);
+  const taxon = iconicTaxa.find(t => t.name.toLowerCase() === taxonName);
   return taxon ? taxon.emoji : '🦁';
 }
