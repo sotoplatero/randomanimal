@@ -5,7 +5,7 @@ export const GET = async () => {
   return await sitemap.response({
     origin: 'https://randomanimal.site',
     paramValues: {
-      "/taxonomy/[taxo]": ['Mammalia', 'Aves', 'Reptilia', 'Amphibia', 'Actinopterygii', 'Mollusca', 'Arachnida', 'Insecta']
+      "/taxonomy/[taxo]": ['mammalia', 'aves', 'reptilia', 'amphibia', 'actinopterygii', 'mollusca', 'arachnida', 'insecta']
     }
   });
 };
