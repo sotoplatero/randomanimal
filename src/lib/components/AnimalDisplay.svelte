@@ -81,7 +81,7 @@
 
 <div class="max-full mx-auto bg-white rounded-lg overflow-hidden">
   <div class="">
-    <div class="aspect-[4/3] overflow-hidden relative rounded-lg">
+    <button on:click={fetchRandomAnimal} class="aspect-[4/3] overflow-hidden relative rounded-lg w-full">
       {#if loading}
         <div class="absolute inset-0 flex items-center justify-center bg-gray-200">
           <p class="text-gray-600">Loading...</p>
@@ -91,15 +91,13 @@
           <p class="text-red-500">Error: {error}</p>
         </div>
       {:else if animal}
-        <h3 class="absolute bottom-0 left-0 right-0 text-2xl md:text-4xl font-semibold py-4 px-8 bg-white bg-opacity-75 text-center flex items-center justify-center">
+        <h3 class="absolute bottom-0 left-0 right-0 text-2xl sm:text-3xl font-semibold py-2 sm:py-4 px-8 bg-white bg-opacity-75 text-center flex items-center justify-center leading-tight">
           <span>{animal.taxon?.preferred_common_name || animal.taxon?.name || 'Unknown species'}</span>
         </h3>
         <img 
           src={animal.taxon.default_photo.medium_url} 
           alt={animal.taxon.preferred_common_name || animal.taxon.name || 'Random animal'} 
           class="object-cover w-full h-full cursor-pointer"
-          on:click={fetchRandomAnimal}
-          on:keydown={(e) => e.key === 'Enter' && fetchRandomAnimal()}
           tabindex="0"
           role="button"
           aria-label="Get another animal"
@@ -109,19 +107,19 @@
           <p class="text-gray-600">No animal image found</p>
         </div>
       {/if}
-    </div>
+    </button>
   </div>
   
   <div class="mt-2">
     <button 
       on:click={fetchRandomAnimal}
-      class="btn btn-primary btn-lg w-full text-white"
+      class="btn btn-primary btn-lg w-full text-white capitalize"
       disabled={loading}
     >
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
       </svg>
-      <span>{loading ? 'Loading...' : `Get another ${taxoName}`}</span>
+      <span>{loading ? 'Loading...' : `Random ${taxoName}`}</span>
     </button>
   </div>
 </div>

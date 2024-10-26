@@ -25,6 +25,7 @@
 	"type": "module",
 	"dependencies": {
 		"daisyui": "^4.12.13",
+		"node-fetch": "^3.3.2",
 		"openai": "^4.68.1"
 	}
 }

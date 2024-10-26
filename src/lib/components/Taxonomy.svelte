@@ -9,4 +9,4 @@
       <span>{name}</span>
     </a>
   {/each}
-</div>
+</div>   

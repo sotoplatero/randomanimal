@@ -29,7 +29,7 @@
         <li><a href="/contact" class="text-blue-500 hover:text-blue-700">Contact</a></li>
       </ul>
       <hr class="my-4">
-      <div class="text-sm text-gray-500">
+      <div class="text-xs text-gray-500">
         © 2023 Random Animal Viewer. All rights reserved.
       </div>
     </div>
