@@ -17,5 +17,9 @@
 
 <AnimalDisplay />
 
+<p class="text-center mt-4">
+  Generate a Random Animal Instantly! Explore fascinating species from the animal kingdom, with interesting facts and captivating images at your fingertips.
+</p>
+
 <Taxonomy {iconicTaxa} />
 
