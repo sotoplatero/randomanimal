@@ -1,15 +1,25 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { fade } from 'svelte/transition';
   import { iconicTaxa } from '$lib/utils/taxonUtils';
+  import confetti from 'canvas-confetti';
 
   export let taxoName: string = 'animal';
   export let specificTaxon: string | null = null;
 
   let animal: any = null;
+  let newAnimal: any = null;
   let loading: boolean = true;
-  let error: string | null = null;
+  let toastMessage: string | null = null;
   let lastRequestTime: number = 0;
   const minRequestInterval: number = 1000; // 1 segundo entre solicitudes
+
+  function showToast(message: string) {
+    toastMessage = message;
+    setTimeout(() => {
+      toastMessage = null;
+    }, 3000);
+  }
 
   async function fetchRandomAnimal() {
     try {
@@ -57,10 +67,22 @@
       console.log(data);
 
       if (data.results && data.results.length > 0) {
-        let newAnimal = data.results[0];
+        newAnimal = data.results[0];
         if (newAnimal.id !== animal?.id) {
-          animal = newAnimal;
-          console.log('New animal fetched:', animal);
+          // Preload the new image
+          const img = new Image();
+          img.src = newAnimal.taxon.default_photo.medium_url;
+          img.onload = () => {
+            animal = newAnimal;
+            console.log('New animal fetched:', animal);
+            // Trigger confetti effect
+            confetti({
+              particleCount: 100,
+              spread: 70,
+              origin: { y: 0.6 }
+            });
+            loading = false;
+          };
         } else {
           console.log('Same animal fetched, retrying...');
           await fetchRandomAnimal();
@@ -69,9 +91,9 @@
         throw new Error('No animals found');
       }
     } catch (e) {
-      error = e instanceof Error ? e.message : 'An unknown error occurred';
-      console.error('Error:', error);
-    } finally {
+      const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred';
+      console.error('Error:', errorMessage);
+      showToast(errorMessage);
       loading = false;
     }
   }
@@ -82,29 +104,22 @@
 <div class="max-full mx-auto bg-white rounded-lg overflow-hidden">
   <div class="">
     <button on:click={fetchRandomAnimal} class="aspect-[4/3] overflow-hidden relative rounded-lg w-full">
-      {#if loading}
-        <div class="absolute inset-0 flex items-center justify-center bg-gray-200">
-          <p class="text-gray-600">Loading...</p>
-        </div>
-      {:else if error}
-        <div class="absolute inset-0 flex items-center justify-center bg-red-100">
-          <p class="text-red-500">Error: {error}</p>
-        </div>
-      {:else if animal}
-        <h3 class="absolute bottom-0 left-0 right-0 text-2xl sm:text-3xl font-semibold py-2 sm:py-4 px-8 bg-white bg-opacity-75 text-center flex items-center justify-center leading-tight">
-          <span>{animal.taxon?.preferred_common_name || animal.taxon?.name || 'Unknown species'}</span>
-        </h3>
-        <img 
-          src={animal.taxon.default_photo.medium_url} 
-          alt={animal.taxon.preferred_common_name || animal.taxon.name || 'Random animal'} 
-          class="object-cover w-full h-full cursor-pointer"
-          tabindex="0"
-          role="button"
-          aria-label="Get another animal"
-        >
+      {#if animal}
+          <img 
+          in:fade={{ duration: 600 }}
+            src={animal.taxon.default_photo.medium_url} 
+            alt={animal.taxon.preferred_common_name || animal.taxon.name || 'Random animal'} 
+            class="object-cover w-full cursor-pointer"
+            tabindex="0"
+            role="button"
+            aria-label="Get another animal"
+          >
+          <h3 class="absolute bottom-0 left-0 right-0 text-2xl sm:text-3xl font-semibold py-2 sm:py-3 px-8 bg-black text-white bg-opacity-75 text-center flex items-center justify-center leading-tight">
+            <span>{animal.taxon?.preferred_common_name || animal.taxon?.name || 'Unknown species'}</span>
+          </h3>
       {:else}
         <div class="absolute inset-0 flex items-center justify-center bg-gray-200">
-          <p class="text-gray-600">No animal image found</p>
+          <p class="text-gray-600">Loading initial animal...</p>
         </div>
       {/if}
     </button>
@@ -123,3 +138,12 @@
     </button>
   </div>
 </div>
+
+{#if toastMessage}
+  <div 
+    class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow-lg"
+    transition:fade
+  >
+    {toastMessage}
+  </div>
+{/if}
