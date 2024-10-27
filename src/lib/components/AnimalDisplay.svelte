@@ -109,7 +109,7 @@
           in:fade={{ duration: 600 }}
             src={animal.taxon.default_photo.medium_url} 
             alt={animal.taxon.preferred_common_name || animal.taxon.name || 'Random animal'} 
-            class="object-cover w-full cursor-pointer"
+            class="object-cover w-full h-full cursor-pointer"
             tabindex="0"
             role="button"
             aria-label="Get another animal"
