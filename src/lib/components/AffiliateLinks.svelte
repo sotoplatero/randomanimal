@@ -16,6 +16,7 @@
     target="_blank" 
     rel="noopener noreferrer sponsored" 
     class="text-blue-600 hover:underline flex items-center"
+    data-umami-event="affiliate"
   >
     <span class="text-2xl mr-2 animate-bell">🎁</span>
     {affiliates[currentAffiliateIndex].name}

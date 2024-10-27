@@ -104,7 +104,7 @@
 
 <div class="max-full mx-auto bg-white rounded-lg overflow-hidden">
   <div class="">
-    <button on:click={fetchRandomAnimal} class="aspect-[4/3] overflow-hidden relative rounded-lg w-full">
+    <button on:click={fetchRandomAnimal} class="aspect-[4/3] overflow-hidden relative rounded-lg w-full" data-umami-event="random">
       {#if animal}
           <img 
           in:fade={{ duration: 600 }}
@@ -131,6 +131,7 @@
       on:click={fetchRandomAnimal}
       class="btn btn-primary btn-lg w-full text-white capitalize"
       disabled={loading}
+      data-umami-event="random"
     >
       <svg class="size-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
