@@ -3,6 +3,7 @@
   import { fade } from 'svelte/transition';
   import { iconicTaxa } from '$lib/utils/taxonUtils';
   import confetti from 'canvas-confetti';
+  import AffiliateLinks from './AffiliateLinks.svelte';
 
   export let taxoName: string = 'animal';
   export let specificTaxon: string | null = null;

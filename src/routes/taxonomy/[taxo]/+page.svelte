@@ -5,7 +5,7 @@
   import Taxonomy from '$lib/components/Taxonomy.svelte';
   import { getTaxonEmoji } from '$lib/utils/taxonUtils';
   import { iconicTaxa } from '$lib/iconicTaxa';
-
+  import AffiliateLinks from '$lib/components/AffiliateLinks.svelte';
   $: taxo = $page.params.taxo;
   $: taxoEmoji = getTaxonEmoji(taxo);
 
@@ -17,13 +17,15 @@
 />
 
 <h1 class="text-lg md:text-2xl font-bold mb-4 flex items-center justify-center capitalize">
-  <span class="mr-2">{taxoEmoji}</span>
+  <span class="text-2xl md:text-3xl mr-2">{taxoEmoji}</span>
   <span>Random {taxo} Animal</span>
 </h1>
 
 {#key $page.params.taxo}
   <AnimalDisplay taxoName={taxo} />
 {/key}
+
+<AffiliateLinks />
 
 <p class="text-center mt-8">
   Generate a Random {taxo} Animal Instantly! Explore fascinating species from the {taxo} category, with interesting facts and captivating images at your fingertips.
