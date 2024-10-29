@@ -3,31 +3,31 @@
   import { fade } from 'svelte/transition';
   import { iconicTaxa } from '$lib/utils/taxonUtils';
   import { browser } from '$app/environment';
+  import { defaultAnimals, type Animal } from '$lib/data/defaultAnimals';
 
   export let taxoName: string = 'animal';
-  export let specificTaxon: string | null = null;
 
-  // Animal por defecto para carga inicial instantánea
-  const defaultAnimal = {
-    id: 1,
-    taxon: {
-      name: 'Red Fox',
-      preferred_common_name: 'Red Fox',
-      default_photo: {
-        medium_url: 'https://static.inaturalist.org/photos/265916780/medium.jpg'
-      }
-    }
-  };
-
-  let animal: any = defaultAnimal;
+  let animal: Animal = defaultAnimals[taxoName] || defaultAnimals.animal;
   let loading: boolean = false;
   let toastMessage: string | null = null;
   let lastRequestTime: number = 0;
-  let animalCache: any[] = [];
+  let animalCache: Animal[] = [];
   const minRequestInterval: number = 1000;
   const CACHE_SIZE = 2;
+  let previousTaxoName: string = 'animal';
 
   let confetti: any;
+
+  // Reactive statement para manejar cambios en taxoName
+  $: if (taxoName !== previousTaxoName) {
+    console.log('Taxon changed:', taxoName);
+    previousTaxoName = taxoName;
+    animal = defaultAnimals[taxoName] || defaultAnimals.animal;
+    animalCache = [];
+    if (browser) {
+      fetchAnimals();
+    }
+  }
 
   onMount(async () => {
     if (browser) {
@@ -54,7 +54,9 @@
         await new Promise(resolve => setTimeout(resolve, minRequestInterval - timeSinceLastRequest));
       }
 
-      const taxon = specificTaxon || iconicTaxa[Math.floor(Math.random() * iconicTaxa.length)].name;
+      const taxon = taxoName === 'animal' ? 
+        iconicTaxa[Math.floor(Math.random() * iconicTaxa.length)].name : 
+        taxoName;
       const timestamp = new Date().getTime();
       
       let maxIdUrl = `https://api.inaturalist.org/v1/observations?per_page=1&order=desc&order_by=id&iconic_taxa=${taxon}&_=${timestamp}`;
