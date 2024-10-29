@@ -2,14 +2,24 @@
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import { iconicTaxa } from '$lib/utils/taxonUtils';
-  import confetti from 'canvas-confetti';
-  import AffiliateLinks from './AffiliateLinks.svelte';
+  import { browser } from '$app/environment';
 
   export let taxoName: string = 'animal';
   export let specificTaxon: string | null = null;
-  export let data: { initialAnimals: any[] };
 
-  let animal: any = null;
+  // Animal por defecto para carga inicial instantánea
+  const defaultAnimal = {
+    id: 1,
+    taxon: {
+      name: 'Red Fox',
+      preferred_common_name: 'Red Fox',
+      default_photo: {
+        medium_url: 'https://static.inaturalist.org/photos/265916780/medium.jpg'
+      }
+    }
+  };
+
+  let animal: any = defaultAnimal;
   let loading: boolean = false;
   let toastMessage: string | null = null;
   let lastRequestTime: number = 0;
@@ -17,13 +27,15 @@
   const minRequestInterval: number = 1000;
   const CACHE_SIZE = 2;
 
-  // Initialize cache with preloaded animals
-  $: {
-    if (data.initialAnimals && data.initialAnimals.length > 0 && animalCache.length === 0) {
-      animalCache = data.initialAnimals;
-      showNextAnimal();
+  let confetti: any;
+
+  onMount(async () => {
+    if (browser) {
+      confetti = (await import('canvas-confetti')).default;
+      // Cargar el primer conjunto de animales en segundo plano
+      fetchAnimals();
     }
-  }
+  });
 
   function showToast(message: string) {
     toastMessage = message;
@@ -108,11 +120,15 @@
     if (animalCache.length > 0) {
       const nextAnimal = animalCache.shift();
       animal = nextAnimal;
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
+      
+      // Solo ejecutar confetti si estamos en el navegador
+      if (browser && confetti) {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
     }
 
     loading = false;

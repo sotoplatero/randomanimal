@@ -3,7 +3,7 @@
 </script>
 
 <div class="flex flex-col min-h-screen">
-  <div class="w-full max-w-screen-sm mx-auto flex-grow py-6">
+  <div class="w-full max-w-screen-md mx-auto flex-grow py-6">
     <div class="container mx-auto px-4">
       <nav class="mb-8 flex items-center justify-between">
         <div class="flex items-center">

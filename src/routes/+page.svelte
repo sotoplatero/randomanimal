@@ -5,7 +5,6 @@
   import RegionDisplay from '$lib/components/RegionDisplay.svelte';
   import { iconicTaxa } from '$lib/iconicTaxa';
 
-
 </script>
 
 <SEO 
