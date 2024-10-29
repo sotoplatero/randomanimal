@@ -7,14 +7,23 @@
 
   export let taxoName: string = 'animal';
   export let specificTaxon: string | null = null;
+  export let data: { initialAnimals: any[] };
 
   let animal: any = null;
-  let loading: boolean = true;
+  let loading: boolean = false;
   let toastMessage: string | null = null;
   let lastRequestTime: number = 0;
   let animalCache: any[] = [];
   const minRequestInterval: number = 1000;
   const CACHE_SIZE = 2;
+
+  // Initialize cache with preloaded animals
+  $: {
+    if (data.initialAnimals && data.initialAnimals.length > 0 && animalCache.length === 0) {
+      animalCache = data.initialAnimals;
+      showNextAnimal();
+    }
+  }
 
   function showToast(message: string) {
     toastMessage = message;
@@ -66,7 +75,7 @@
 
       if (data.results && data.results.length > 0) {
         // Preload images and add to cache
-        const newAnimals = data.results.filter(newAnimal => 
+        const newAnimals = data.results.filter((newAnimal: any) => 
           !animalCache.some(cached => cached.id === newAnimal.id)
         );
 
@@ -114,10 +123,10 @@
     }
   }
 
-  onMount(async () => {
-    loading = true;
-    await fetchAnimals();
-    await showNextAnimal();
+  onMount(() => {
+    if (animalCache.length < CACHE_SIZE) {
+      fetchAnimals();
+    }
   });
 </script>
 
