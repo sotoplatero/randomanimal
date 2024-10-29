@@ -9,11 +9,12 @@
   export let specificTaxon: string | null = null;
 
   let animal: any = null;
-  let newAnimal: any = null;
   let loading: boolean = true;
   let toastMessage: string | null = null;
   let lastRequestTime: number = 0;
-  const minRequestInterval: number = 1000; // 1 segundo entre solicitudes
+  let animalCache: any[] = [];
+  const minRequestInterval: number = 1000;
+  const CACHE_SIZE = 2;
 
   function showToast(message: string) {
     toastMessage = message;
@@ -22,12 +23,10 @@
     }, 3000);
   }
 
-  async function fetchRandomAnimal() {
+  async function fetchAnimals() {
     try {
-      loading = true;
-      console.log('Fetching new animal...');
+      console.log('Fetching new animals...');
 
-      // Implementar retraso para evitar solicitudes demasiado frecuentes
       const now = Date.now();
       const timeSinceLastRequest = now - lastRequestTime;
       if (timeSinceLastRequest < minRequestInterval) {
@@ -37,7 +36,6 @@
       const taxon = specificTaxon || iconicTaxa[Math.floor(Math.random() * iconicTaxa.length)].name;
       const timestamp = new Date().getTime();
       
-      // Primero, obtenemos el ID máximo para el taxón
       let maxIdUrl = `https://api.inaturalist.org/v1/observations?per_page=1&order=desc&order_by=id&iconic_taxa=${taxon}&_=${timestamp}`;
       const maxIdResponse = await fetch(maxIdUrl);
       const maxIdData = await maxIdResponse.json();
@@ -49,8 +47,7 @@
       const maxId = maxIdData.results[0].id;
       const randomId = Math.floor(Math.random() * maxId);
       
-      // Ahora, obtenemos un animal aleatorio usando id_above
-      let url = `https://api.inaturalist.org/v1/observations?per_page=1&order=asc&order_by=id&id_above=${randomId}&iconic_taxa=${taxon}&has[]=photos&_=${timestamp}`;
+      let url = `https://api.inaturalist.org/v1/observations?per_page=2&order=asc&order_by=id&id_above=${randomId}&iconic_taxa=${taxon}&has[]=photos&_=${timestamp}`;
       console.log(url);
 
       const response = await fetch(url);
@@ -65,29 +62,24 @@
       }
 
       const data = await response.json();
-      console.log(data);
+      console.log('API response:', data);
 
       if (data.results && data.results.length > 0) {
-        newAnimal = data.results[0];
-        if (newAnimal.id !== animal?.id) {
-          // Preload the new image
+        // Preload images and add to cache
+        const newAnimals = data.results.filter(newAnimal => 
+          !animalCache.some(cached => cached.id === newAnimal.id)
+        );
+
+        for (const newAnimal of newAnimals) {
           const img = new Image();
           img.src = newAnimal.taxon.default_photo.medium_url;
-          img.onload = () => {
-            animal = newAnimal;
-            console.log('New animal fetched:', animal);
-            // Trigger confetti effect
-            confetti({
-              particleCount: 100,
-              spread: 70,
-              origin: { y: 0.6 }
-            });
-            loading = false;
-          };
-        } else {
-          console.log('Same animal fetched, retrying...');
-          await fetchRandomAnimal();
+          await new Promise((resolve) => {
+            img.onload = resolve;
+          });
         }
+
+        animalCache = [...animalCache, ...newAnimals].slice(-CACHE_SIZE);
+        console.log('Updated cache:', animalCache);
       } else {
         throw new Error('No animals found');
       }
@@ -95,19 +87,51 @@
       const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred';
       console.error('Error:', errorMessage);
       showToast(errorMessage);
-      loading = false;
     }
   }
 
-  onMount(fetchRandomAnimal);
+  async function showNextAnimal() {
+    if (animalCache.length === 0) {
+      loading = true;
+      await fetchAnimals();
+    }
+
+    if (animalCache.length > 0) {
+      const nextAnimal = animalCache.shift();
+      animal = nextAnimal;
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+
+    loading = false;
+    
+    // Fetch more animals if cache is getting low
+    if (animalCache.length < CACHE_SIZE) {
+      fetchAnimals();
+    }
+  }
+
+  onMount(async () => {
+    loading = true;
+    await fetchAnimals();
+    await showNextAnimal();
+  });
 </script>
 
 <div class="max-full mx-auto bg-white rounded-lg overflow-hidden">
   <div class="">
-    <button on:click={fetchRandomAnimal} class="aspect-[4/3] overflow-hidden relative rounded-lg w-full" data-umami-event="random">
+    <button 
+      on:click={showNextAnimal} 
+      class="aspect-[4/3] overflow-hidden relative rounded-lg w-full" 
+      data-umami-event="random"
+      disabled={loading}
+    >
       {#if animal}
           <img 
-          in:fade={{ duration: 600 }}
+            in:fade={{ duration: 600 }}
             src={animal.taxon.default_photo.medium_url} 
             alt={animal.taxon.preferred_common_name || animal.taxon.name || 'Random animal'} 
             class="object-cover w-full h-full cursor-pointer"
@@ -128,7 +152,7 @@
   
   <div class="mt-2">
     <button 
-      on:click={fetchRandomAnimal}
+      on:click={showNextAnimal}
       class="btn btn-primary btn-lg w-full text-white capitalize"
       disabled={loading}
       data-umami-event="random"
