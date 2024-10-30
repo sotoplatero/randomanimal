@@ -1,4 +1,11 @@
+<script lang="ts">
+  import SEO from '$lib/components/SEO.svelte';
+</script>
 
+<SEO 
+  title="Contact Random Animal"
+  description="Contact Random Animal to learn more about our services and how we can help you."
+/>
 <section class="hero">
 
   <div class="hero-content flex-col text-center">
