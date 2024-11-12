@@ -6,5 +6,7 @@ export const iconicTaxa = [
     { name: 'Actinopterygii', emoji: '🐠' },
     { name: 'Mollusca', emoji: '🐌' },
     { name: 'Arachnida', emoji: '🕷️' },
-    { name: 'Insecta', emoji: '🦋' }
+    { name: 'Insecta', emoji: '🦋' },
+    { name: 'Dogs', emoji: '🐶' },
+    { name: 'Cats', emoji: '🐱' }
   ];

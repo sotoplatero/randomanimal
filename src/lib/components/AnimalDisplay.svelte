@@ -71,7 +71,6 @@
       const randomId = Math.floor(Math.random() * maxId);
       
       let url = `https://api.inaturalist.org/v1/observations?per_page=2&order=asc&order_by=id&id_above=${randomId}&iconic_taxa=${taxon}&has[]=photos&_=${timestamp}`;
-      console.log(url);
 
       const response = await fetch(url);
       lastRequestTime = Date.now();
@@ -152,7 +151,7 @@
   <div class="">
     <button 
       on:click={showNextAnimal} 
-      class="aspect-[4/3] overflow-hidden relative rounded-lg w-full" 
+      class="aspect-square overflow-hidden relative rounded-lg w-full" 
       data-umami-event="random"
       disabled={loading}
     >
