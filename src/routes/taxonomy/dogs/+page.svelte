@@ -6,8 +6,7 @@
   import { getTaxonEmoji } from '$lib/utils/taxonUtils';
   import { iconicTaxa } from '$lib/iconicTaxa';
   import AffiliateLinks from '$lib/components/AffiliateLinks.svelte';
-  $: taxo = $page.params.taxo;
-  $: taxoEmoji = getTaxonEmoji(taxo);
+  $: taxoEmoji = iconicTaxa.find(t => t.name.toLowerCase() === 'dogs')?.emoji || '🐶';
 
 </script>
 
@@ -21,14 +20,12 @@
   <span>Random Dog</span>
 </h1>
 
-{#key $page.params.taxo}
-  <RandomDog />
-{/key}
+<RandomDog />
 
 <AffiliateLinks />
 
 <p class="text-center mt-8">
-  Generate a Random {taxo} Animal Instantly! Explore fascinating species from the {taxo} category, with interesting facts and captivating images at your fingertips.
+  Generate a Random Dog Instantly! Explore fascinating species from the Dog category, with interesting facts and captivating images at your fingertips.
 </p>
 
 <Taxonomy iconicTaxa={iconicTaxa} />

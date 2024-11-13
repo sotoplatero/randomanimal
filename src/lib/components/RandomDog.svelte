@@ -3,7 +3,7 @@
     import { fade } from 'svelte/transition';
     import { browser } from '$app/environment';
   
-    export let taxoName: string = 'dog';
+    export let taxoName: string = 'dogs';
   
     let animal: { imageUrl: string, name: string } | null = null;
     let loading: boolean = false;
@@ -18,8 +18,8 @@
     onMount(async () => {
       if (browser) {
         confetti = (await import('canvas-confetti')).default;
-        // Load the initial set of dogs
-        fetchDogs();
+        await fetchDogs(); // Cargar el primer conjunto de perros
+        showNextAnimal();  // Mostrar el primer perro cargado
       }
     });
   
@@ -71,6 +71,11 @@
   
           animalCache = [...animalCache, ...newDogs].slice(-CACHE_SIZE);
           console.log('Updated cache:', animalCache);
+  
+          // Asignar el primer animal de animalCache a animal para mostrarlo inmediatamente
+          if (!animal && animalCache.length > 0) {
+            animal = animalCache.shift()!;
+          }
         } else {
           throw new Error('No dogs found');
         }
@@ -119,18 +124,15 @@
         disabled={loading}
       >
         {#if animal}
-            <img 
-              in:fade={{ duration: 600 }}
-              src={animal.imageUrl} 
-              alt={animal.name} 
-              class="object-cover w-full h-full cursor-pointer"
-              tabindex="0"
-              role="button"
-              aria-label="Get another dog"
-            >
-            <h3 class="absolute bottom-0 left-0 right-0 text-2xl sm:text-3xl font-semibold py-2 sm:py-3 px-8 bg-black text-white bg-opacity-75 text-center flex items-center justify-center leading-tight">
-              <span>{animal.name}</span>
-            </h3>
+          <img 
+            in:fade={{ duration: 600 }}
+            src={animal.imageUrl} 
+            alt={animal.name} 
+            class="object-cover w-full h-full cursor-pointer"
+            tabindex="0"
+            role="button"
+            aria-label="Get another dog"
+          >
         {:else}
           <div class="absolute inset-0 flex items-center justify-center bg-gray-200">
             <p class="text-gray-600">Loading initial dog...</p>

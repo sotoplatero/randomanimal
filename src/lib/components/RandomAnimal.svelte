@@ -2,24 +2,35 @@
     import { onMount } from 'svelte';
     import { fade } from 'svelte/transition';
     import { browser } from '$app/environment';
+    import { fetchAnimals, type Animal } from '$lib/fetchanimals';
   
-    export let taxoName: string = 'dog'; // 'dog' or 'animal'
+    export let taxoName: string = 'animal';
   
-    let animal: { imageUrl: string, name: string } | null = null;
+    let animal: Animal | null = null;
     let loading: boolean = false;
     let toastMessage: string | null = null;
     let lastRequestTime: number = 0;
-    let animalCache: { imageUrl: string, name: string }[] = [];
+    let animalCache: Animal[] = [];
     const minRequestInterval: number = 1000;
-    const CACHE_SIZE = 2;
+    const CACHE_SIZE = 5;
+    let previousTaxoName: string = 'animal';
   
     let confetti: any;
+  
+    $: if (taxoName !== previousTaxoName) {
+      previousTaxoName = taxoName;
+      animal = null;
+      animalCache = [];
+      if (browser) {
+        loadAnimals();
+      }
+    }
   
     onMount(async () => {
       if (browser) {
         confetti = (await import('canvas-confetti')).default;
-        // Load the initial set of animals
-        fetchAnimals();
+        await loadAnimals();
+        showNextAnimal(); // Display the first animal after loading
       }
     });
   
@@ -30,58 +41,29 @@
       }, 3000);
     }
   
-    async function fetchAnimals() {
+    async function loadAnimals() {
       try {
-        console.log('Fetching new animals...');
-  
         const now = Date.now();
         const timeSinceLastRequest = now - lastRequestTime;
+  
         if (timeSinceLastRequest < minRequestInterval) {
-          await new Promise(resolve => setTimeout(resolve, minRequestInterval - timeSinceLastRequest));
+          await new Promise((resolve) => setTimeout(resolve, minRequestInterval - timeSinceLastRequest));
         }
   
-        let newAnimals = [];
-  
-        if (taxoName === 'dog') {
-          // Fetch from Dog API
-          const response = await fetch('https://dog.ceo/api/breeds/image/random/2');
-          if (response.ok) {
-            const data = await response.json();
-            newAnimals = data.message.map((imageUrl: string) => ({
-              imageUrl,
-              name: 'Dog'
-            }));
-          } else {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-        } else {
-          // Fetch from iNaturalist API for other animals
-          const timestamp = new Date().getTime();
-          const response = await fetch(
-            `https://api.inaturalist.org/v1/observations?per_page=2&order=asc&order_by=id&iconic_taxa=${taxoName}&has[]=photos&_=${timestamp}`
-          );
-  
-          if (response.ok) {
-            const data = await response.json();
-            newAnimals = data.results.map((item: any) => ({
-              imageUrl: item.taxon.default_photo.medium_url,
-              name: item.taxon.preferred_common_name || item.taxon.name || 'Unknown species'
-            }));
-          } else {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-        }
-  
+        const newAnimals = await fetchAnimals(taxoName);
         lastRequestTime = Date.now();
   
-        // Preload images and update cache
-        for (const animal of newAnimals) {
+        const uniqueAnimals = newAnimals.filter(
+          (newAnimal) => !animalCache.some((cachedAnimal) => cachedAnimal.id === newAnimal.id)
+        );
+  
+        for (const newAnimal of uniqueAnimals) {
           const img = new Image();
-          img.src = animal.imageUrl;
-          await new Promise((resolve) => img.onload = resolve);
+          img.src = newAnimal.taxon.default_photo.medium_url;
+          await new Promise((resolve) => (img.onload = resolve));
         }
   
-        animalCache = [...animalCache, ...newAnimals].slice(-CACHE_SIZE);
+        animalCache = [...animalCache, ...uniqueAnimals];
         console.log('Updated cache:', animalCache);
       } catch (e) {
         const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred';
@@ -90,82 +72,83 @@
       }
     }
   
-    async function showNextAnimal() {
+    function showNextAnimal() {
       if (animalCache.length === 0) {
         loading = true;
-        await fetchAnimals();
-      }
+        loadAnimals().then(() => {
+          if (animalCache.length > 0) {
+            animal = animalCache.shift()!;
+            loading = false;
+          }
+        });
+      } else {
+        animal = animalCache.shift()!;
   
-      if (animalCache.length > 0) {
-        const nextAnimal = animalCache.shift();
-        animal = nextAnimal;
-        
-        // Show confetti effect if in browser
         if (browser && confetti) {
           confetti({
             particleCount: 100,
             spread: 70,
-            origin: { y: 0.6 }
+            origin: { y: 0.6 },
           });
         }
-      }
   
-      loading = false;
-      
-      // Fetch more animals if cache is getting low
-      if (animalCache.length < CACHE_SIZE) {
-        fetchAnimals();
+        if (animalCache.length < 3) {
+          loadAnimals();
+        }
       }
     }
   </script>
   
   <div class="max-full mx-auto bg-white rounded-lg overflow-hidden">
-    <div class="">
-      <button 
-        on:click={showNextAnimal} 
-        class="aspect-square overflow-hidden relative rounded-lg w-full" 
-        data-umami-event="random"
-        disabled={loading}
-      >
-        {#if animal}
-            <img 
-              in:fade={{ duration: 600 }}
-              src={animal.imageUrl} 
-              alt={animal.name} 
-              class="object-cover w-full h-full cursor-pointer"
-              tabindex="0"
-              role="button"
-              aria-label="Get another animal"
-            >
-            <h3 class="absolute bottom-0 left-0 right-0 text-2xl sm:text-3xl font-semibold py-2 sm:py-3 px-8 bg-black text-white bg-opacity-75 text-center flex items-center justify-center leading-tight">
-              <span>{animal.name}</span>
-            </h3>
-        {:else}
-          <div class="absolute inset-0 flex items-center justify-center bg-gray-200">
-            <p class="text-gray-600">Loading initial animal...</p>
-          </div>
-        {/if}
-      </button>
+      <div class="">
+        <button 
+          on:click={showNextAnimal} 
+          class="aspect-square overflow-hidden relative rounded-lg w-full" 
+          data-umami-event="random"
+          disabled={loading}
+        >
+          {#if animal}
+              <img 
+                in:fade={{ duration: 600 }}
+                src={animal.taxon.default_photo.medium_url} 
+                alt={animal.taxon.preferred_common_name || animal.taxon.name || 'Random animal'} 
+                class="object-cover w-full h-full cursor-pointer"
+                tabindex="0"
+                role="button"
+                aria-label="Get another animal"
+              >
+              <h3 class="absolute bottom-0 left-0 right-0 text-2xl sm:text-3xl font-semibold py-2 sm:py-3 px-8 bg-black text-white bg-opacity-75 text-center flex items-center justify-center leading-tight">
+                <span>{animal.taxon?.preferred_common_name || animal.taxon?.name || 'Unknown species'}</span>
+              </h3>
+          {:else}
+            <div class="absolute inset-0 flex items-center justify-center bg-gray-200">
+              <p class="text-gray-600">Loading initial animal...</p>
+            </div>
+          {/if}
+        </button>
+      </div>
+      
+      <div class="mt-2">
+        <button 
+          on:click={showNextAnimal}
+          class="btn btn-primary btn-lg w-full text-white capitalize"
+          disabled={loading}
+          data-umami-event="random"
+        >
+          <svg class="size-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          <span>{loading ? 'Loading...' : `Random ${taxoName}`}</span>
+        </button>
+      </div>
     </div>
-    
-    <div class="mt-2">
-      <button 
-        on:click={showNextAnimal}
-        class="btn btn-primary btn-lg w-full text-white capitalize"
-        disabled={loading}
-        data-umami-event="random"
-      >
-        <span>{loading ? 'Loading...' : `Random ${taxoName}`}</span>
-      </button>
-    </div>
-  </div>
   
-  {#if toastMessage}
-    <div 
-      class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow-lg"
-      transition:fade
-    >
-      {toastMessage}
-    </div>
-  {/if}
+  <!-- {#if toastMessage}
+      <div 
+        class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow-lg"
+        transition:fade
+      >
+        {toastMessage}
+      </div>
+  {/if} -->
   
