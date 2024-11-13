@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
-  import { iconicTaxa } from '$lib/utils/taxonUtils';
+  import { iconicTaxa } from '$lib/iconicTaxa';
   import { browser } from '$app/environment';
   import { defaultAnimals, type Animal } from '$lib/data/defaultAnimals';
 
