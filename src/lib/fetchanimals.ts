@@ -3,7 +3,7 @@ import { PUBLIC_DOG_API_KEY } from '$env/static/public';
 // src/lib/api/fetchAnimals.ts
 // src/lib/api/fetchAnimals.ts
 
-import { iconicTaxa } from '$lib/utils/taxonUtils';
+import { iconicTaxa } from '$lib/iconicTaxa';
 
 export interface Animal {
   id: number;
