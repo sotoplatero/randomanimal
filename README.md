@@ -1,38 +1,72 @@
-# create-svelte
+# Random Animal Generator
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+A random animal generator that uses the iNaturalist API to display detailed information about different species based on their taxonomy.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Taxonomy Exploration**: Browse through different taxonomic groups (Birds, Mammals, etc.) and discover random animals within each group.
+- **Detailed Information**: For each animal, displays:
+  - Common and scientific names
+  - High-quality image
+  - Conservation status (extinct, threatened, endemic)
+  - Taxonomic rank
+  - Wikipedia summary
+  - Link for more information
+
+## Technologies
+
+- [SvelteKit](https://kit.svelte.dev/) - Web framework
+- [iNaturalist API](https://api.inaturalist.org/v1/) - Biodiversity data source
+- [TailwindCSS](https://tailwindcss.com/) - Styling
+- [DaisyUI](https://daisyui.com/) - UI Components
+
+## Installation
 
 ```bash
-# create a new project in the current directory
-npm create svelte@latest
+# Clone the repository
+git clone https://github.com/sotoplatero/randomanimal.git
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+# Install dependencies
+cd randomanimal
+npm install
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
+# Start development server
 npm run dev
 
-# or start the server and open the app in a new browser tab
+# Or start and open in browser
 npm run dev -- --open
 ```
 
+## Usage
+
+1. Visit the home page to see random animals from any taxonomy
+2. Navigate to `/taxonomy/[taxo]` to see animals from a specific taxonomy
+   - Example: `/taxonomy/Aves` to see birds
+   - Example: `/taxonomy/Mammalia` to see mammals
+
 ## Building
 
-To create a production version of your app:
+To create a production version:
 
 ```bash
 npm run build
 ```
 
-You can preview the production build with `npm run preview`.
+You can preview the production build with:
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+```bash
+npm run preview
+```
+
+## Contributing
+
+Contributions are welcome. Please open an issue first to discuss what you would like to change.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Credits
+
+- Data and images provided by [iNaturalist](https://www.inaturalist.org/)
+- Developed by [sotoplatero](https://github.com/sotoplatero)

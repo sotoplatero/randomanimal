@@ -1,5 +1,5 @@
 <script lang="ts">
-  import AnimalDisplay from '$lib/components/AnimalDisplay.svelte';
+  import EnhancedAnimalDisplay from '$lib/components/EnhancedAnimalDisplay.svelte';
   import SEO from '$lib/components/SEO.svelte';
   import Taxonomy from '$lib/components/Taxonomy.svelte';
   import RegionDisplay from '$lib/components/RegionDisplay.svelte';
@@ -8,17 +8,16 @@
 </script>
 
 <SEO 
-  title="Random Animal Viewer"
-  description="Discover random animals from various taxonomies and regions. Learn about different species with our interactive animal viewer."
+  title="Enhanced Random Animal Viewer"
+  description="Discover random animals, dogs, and cats! Explore fascinating species with our interactive animal viewer featuring various breeds and species."
 />
 
-<h1 class="text-3xl font-bold mb-4 text-center">Random Animal Generator</h1>
+<h1 class="text-3xl font-bold mb-4 text-center">Enhanced Animal Generator</h1>
 
-<AnimalDisplay />
+<EnhancedAnimalDisplay />
 
 <p class="text-center mt-4">
-  Generate a Random Animal Instantly! Explore fascinating species from the animal kingdom, with interesting facts and captivating images at your fingertips.
+  Generate Random Animals, Dogs, and Cats Instantly! Explore fascinating species and breeds with interesting facts and captivating images at your fingertips.
 </p>
 
 <Taxonomy {iconicTaxa} />
-
