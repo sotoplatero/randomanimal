@@ -61,7 +61,7 @@
                 >
                     Next {taxoName || 'Animal'}
                 </button>
-                
+
                 <div class="space-y-2">
                     <h2 class="text-2xl font-bold text-center">
                         {animal.taxon.preferred_common_name || animal.taxon.name}
@@ -86,7 +86,7 @@
                     {/if}
 
                     {#if animal.taxon.wikipedia_summary}
-                        <p class="text-gray-700 mt-4">{animal.taxon.wikipedia_summary}</p>
+                        <p class="text-gray-700 mt-4">{@html animal.taxon.wikipedia_summary}</p>
                     {/if}
 
                     {#if animal.taxon.wikipedia_url}
