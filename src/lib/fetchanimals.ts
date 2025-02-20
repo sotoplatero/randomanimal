@@ -31,50 +31,29 @@ export async function fetchAnimals(taxoName: string = 'animal', maxRetries: numb
 
     while (attempts < maxRetries) {
         try {
-            let queryParam: string;
-            
+            let queryParams = new URLSearchParams({
+                per_page: '10',
+                order: 'desc',
+                order_by: 'id',
+                photos: 'true',
+                licensed: 'true',
+                quality_grade: 'research',
+                _: timestamp.toString()
+            });
+
             if (taxoName === 'animal') {
                 // Para animales aleatorios, usamos iconic_taxa
                 const randomTaxon = iconicTaxa[Math.floor(Math.random() * iconicTaxa.length)].name;
-                queryParam = `iconic_taxa=${randomTaxon}`;
+                queryParams.append('iconic_taxa', randomTaxon);
             } else {
-                // Para cualquier taxonomía específica
-                queryParam = `iconic_taxa=${taxoName}`;
+                // Para taxonomías específicas, usamos taxon_name
+                queryParams.append('taxon_name', taxoName);
             }
 
-            // Fetch max ID to get a random range of animals
-            const maxIdUrl = `https://api.inaturalist.org/v1/observations?per_page=1&order=desc&order_by=id&${queryParam}&_=${timestamp}`;
-            const maxIdResponse = await fetch(maxIdUrl);
+            // Fetch observations with the specified parameters
+            const url = `https://api.inaturalist.org/v1/observations?${queryParams.toString()}`;
+            const response = await fetch(url);
             
-            if (!maxIdResponse.ok) {
-                throw new Error(`HTTP error! status: ${maxIdResponse.status}`);
-            }
-
-            const maxIdData = await maxIdResponse.json();
-
-            if (!maxIdData.results || maxIdData.results.length === 0) {
-                throw new Error('No animals found for this taxon');
-            }
-
-            const maxId = maxIdData.results[0].id;
-            const randomId = Math.floor(Math.random() * maxId);
-
-            // Fetch a random selection of animals with quality parameters
-            const url = new URL('https://api.inaturalist.org/v1/observations');
-            const params = new URLSearchParams({
-                per_page: '10',                    // Más resultados para más variedad
-                order: 'asc',
-                order_by: 'id',
-                id_above: randomId.toString(),
-                quality_grade: 'research',        // Solo observaciones verificadas
-                photos: 'true',                   // Debe tener fotos
-                licensed: 'true',                 // Solo fotos con licencia
-                _: timestamp.toString()
-            });
-            url.search = params.toString() + '&' + queryParam;
-
-            const response = await fetch(url.toString());
-
             if (response.status === 429) {
                 throw new Error('Rate limit exceeded. Please try again later.');
             }
@@ -84,8 +63,9 @@ export async function fetchAnimals(taxoName: string = 'animal', maxRetries: numb
             }
 
             const data = await response.json();
+            
             if (data.results && data.results.length > 0) {
-                // Para cada resultado, obtener información adicional del taxón
+                // Obtener detalles adicionales para cada taxón
                 const enrichedResults = await Promise.all(
                     data.results.map(async (result: any) => {
                         if (result.taxon?.id) {
@@ -109,13 +89,17 @@ export async function fetchAnimals(taxoName: string = 'animal', maxRetries: numb
                         return result;
                     })
                 );
-                return enrichedResults;
+
+                // Aleatorizar el orden de los resultados
+                return enrichedResults
+                    .sort(() => Math.random() - 0.5)
+                    .filter((result: any) => result.taxon?.default_photo?.medium_url);
             }
 
             attempts++;
         } catch (error) {
+            console.error('Error fetching animals:', error);
             if (attempts === maxRetries - 1) {
-                console.error('Error fetching animals:', error);
                 throw error;
             }
             attempts++;
