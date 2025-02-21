@@ -1,11 +1,11 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import RandomAnimal from '$lib/components/RandomAnimal.svelte';
+  import EnhancedAnimalDisplay from '$lib/components/EnhancedAnimalDisplay.svelte';
   import SEO from '$lib/components/SEO.svelte';
   import Taxonomy from '$lib/components/Taxonomy.svelte';
   import { getTaxonEmoji } from '$lib/utils/taxonUtils';
   import { iconicTaxa } from '$lib/iconicTaxa';
-  import AffiliateLinks from '$lib/components/AffiliateLinks.svelte';
+  
   $: taxo = $page.params.taxo;
   $: taxoEmoji = getTaxonEmoji(taxo);
 
@@ -21,13 +21,9 @@
   <span>Random {taxo} Animal</span>
 </h1>
 
-{#key $page.params.taxo}
-  <RandomAnimal taxoName={taxo} />
-{/key}
+<EnhancedAnimalDisplay taxoName={taxo} />
 
-<!-- <AffiliateLinks /> -->
-
-<p class="text-center mt-8 px-8">
+<p class="text-center mt-4">
   Generate a Random {taxo} Animal Instantly! Explore fascinating species from the {taxo} category, with interesting facts and captivating images at your fingertips.
 </p>
 
