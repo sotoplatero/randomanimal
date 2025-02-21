@@ -6,26 +6,22 @@
 
     $: specie = $page.params.specie;
     $: specieData = commonSpecies.find(s => s.title.toLowerCase() === specie.toLowerCase());
-    $: taxoName = specieData?.name;
 </script>
 
 <div class="container mx-auto px-4 py-8">
-    <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold mb-2">
-            {#if specieData}
-                <span class="mr-2">{specieData.emoji}</span>
+    {#if specieData}
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-2">
+                <span class="text-4xl mr-2">{specieData.emoji}</span>
                 {specieData.title}
-            {:else}
-                Unknown Species
-            {/if}
-        </h1>
-    </div>
+            </h1>
+            <p class="text-gray-600 italic">{specieData.name}</p>
+        </div>
 
-    {#if taxoName}
-        <EnhancedAnimalDisplay taxoName={taxoName} />
+        <EnhancedAnimalDisplay taxoName={specieData.name} />
     {:else}
-        <div class="text-center text-gray-500">
-            Species not found
+        <div class="text-center text-red-600">
+            <p>Species not found</p>
         </div>
     {/if}
 </div>
@@ -34,4 +30,3 @@
     <h2 class="text-2xl font-bold mb-4 text-center">Random Animal by Species</h2>
     <Species />
 </section>
-

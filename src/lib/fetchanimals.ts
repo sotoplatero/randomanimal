@@ -2,7 +2,6 @@
 import { iconicTaxa, commonSpecies } from './iconicTaxa';
 
 const API_URL = 'https://api.inaturalist.org/v1/observations';
-const TAXA_URL = 'https://api.inaturalist.org/v1/taxa';
 const PER_PAGE = 3;
 
 export interface Animal {
@@ -29,7 +28,7 @@ interface ApiResponse {
 }
 
 // Construye los parámetros de la URL para la API
-async function buildApiParams(taxoName?: string, page: number = 1): Promise<URLSearchParams> {
+function buildApiParams(taxoName?: string, page: number = 1): URLSearchParams {
     const params = new URLSearchParams({
         per_page: PER_PAGE.toString(),
         page: page.toString(),
@@ -45,6 +44,7 @@ async function buildApiParams(taxoName?: string, page: number = 1): Promise<URLS
         if (speciesEntry) {
             // Si es una especie específica, usamos su taxon_id
             params.append('taxon_id', speciesEntry.taxon_id.toString());
+            // console.log('taxoName', params.getAll());
         } else if (taxoName === 'animal') {
             // Si es 'animal', incluimos todas las taxonomías
             iconicTaxa.forEach(taxon => {
@@ -99,7 +99,7 @@ function filterValidResults(results: any[]): Animal[] {
 export async function fetchAnimals(taxoName?: string): Promise<Animal[]> {
     try {
         // Primera llamada para obtener el total de resultados
-        const initialParams = await buildApiParams(taxoName);
+        const initialParams = buildApiParams(taxoName);
         const initialResponse = await fetch(`${API_URL}?${initialParams}`);
         
         if (initialResponse.status === 429) {
@@ -118,7 +118,8 @@ export async function fetchAnimals(taxoName?: string): Promise<Animal[]> {
 
         // Obtener una página aleatoria
         const randomPage = getRandomPage(initialData.total_results);
-        const randomParams = await buildApiParams(taxoName, randomPage);
+        const randomParams = buildApiParams(taxoName, randomPage);
+        console.log(`${API_URL}?${randomParams}`);
         const randomResponse = await fetch(`${API_URL}?${randomParams}`);
         
         if (!randomResponse.ok) {
@@ -126,33 +127,34 @@ export async function fetchAnimals(taxoName?: string): Promise<Animal[]> {
         }
 
         const randomData: ApiResponse = await randomResponse.json();
-
+        console.log('randomData', randomData);
         // Enriquecer los resultados con detalles adicionales
-        const enrichedResults = await Promise.all(
-            randomData.results.map(async (result: any) => {
-                if (result.taxon?.id) {
-                    try {
-                        const taxonResponse = await fetch(`${TAXA_URL}/${result.taxon.id}`);
-                        if (taxonResponse.ok) {
-                            const taxonData = await taxonResponse.json();
-                            if (taxonData.results?.[0]) {
-                                result.taxon = {
-                                    ...result.taxon,
-                                    ...taxonData.results[0]
-                                };
-                            }
-                        }
-                    } catch (error) {
-                        console.error('Error fetching taxon details:', error);
-                    }
-                }
-                return result;
-            })
-        );
+        // const enrichedResults = await Promise.all(
+        //     randomData.results.map(async (result: any) => {
+        //         if (result.taxon?.id) {
+        //             try {
+        //                 const taxonResponse = await fetch(`https://api.inaturalist.org/v1/taxa/${result.taxon.id}`);
+        //                 if (taxonResponse.ok) {
+        //                     const taxonData = await taxonResponse.json();
+        //                     if (taxonData.results?.[0]) {
+        //                         result.taxon = {
+        //                             ...result.taxon,
+        //                             ...taxonData.results[0]
+        //                         };
+        //                     }
+        //                 }
+        //             } catch (error) {
+        //                 console.error('Error fetching taxon details:', error);
+        //             }
+        //         }
+        //         return result;
+        //     })
+        // );
 
-        // Filtrar y aleatorizar los resultados
-        return filterValidResults(enrichedResults)
-            .sort(() => Math.random() - 0.5);
+        // // Filtrar y aleatorizar los resultados
+        // return filterValidResults(enrichedResults)
+        //     .sort(() => Math.random() - 0.5);
+        return randomData.results;
 
     } catch (error) {
         console.error('Error fetching animals:', error);

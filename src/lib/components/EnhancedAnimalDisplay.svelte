@@ -44,6 +44,7 @@
                 animal = animalCache.pop() || null;
                 // Si quedan 2 animales, cargamos más de forma asíncrona
                 if (animalCache.length === 2) {
+                    console.log('cargando más animales');
                     fetchAnimals(currentTaxo || 'animal').then(animals => {
                         if (currentTaxo === taxoName) {
                             animalCache = animals;

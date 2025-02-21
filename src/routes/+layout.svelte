@@ -3,12 +3,12 @@
 </script>
 
 <div class="flex flex-col min-h-screen">
-  <div class="w-full max-w-screen-md mx-auto flex-grow py-6">
+  <div class="w-full max-w-screen-md mx-auto flex-grow">
     <div class="container mx-auto px-4">
-      <nav class="mb-8 flex items-center justify-between">
+      <nav class="py-3 flex items-center justify-between">
         <div class="flex items-center">
-          <a href="/" class="text-xl flex items-center font-bold" title="Random Animal Viewer">
-            <span class="text-3xl">🦁</span> RandomAnimal
+          <a href="/" class="flex items-center font-bold" title="Random Animal Viewer">
+            <span class="text-2xl">🦁</span> RandomAnimal
           </a>
         </div>
       </nav>
