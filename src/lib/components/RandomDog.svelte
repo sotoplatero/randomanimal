@@ -97,13 +97,13 @@
         animal = nextAnimal;
         
         // Show confetti effect if in browser
-        if (browser && confetti) {
-          confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 }
-          });
-        }
+        // if (browser && confetti) {
+        //   confetti({
+        //     particleCount: 100,
+        //     spread: 70,
+        //     origin: { y: 0.6 }
+        //   });
+        // }
       }
   
       loading = false;

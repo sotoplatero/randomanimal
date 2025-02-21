@@ -25,7 +25,7 @@
   <RandomAnimal taxoName={taxo} />
 {/key}
 
-<AffiliateLinks />
+<!-- <AffiliateLinks /> -->
 
 <p class="text-center mt-8 px-8">
   Generate a Random {taxo} Animal Instantly! Explore fascinating species from the {taxo} category, with interesting facts and captivating images at your fingertips.

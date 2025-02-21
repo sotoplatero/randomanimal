@@ -8,7 +8,7 @@
 </script>
 
 <SEO 
-  title="Random Animal Viewer"
+  title="Random Animal Generator"
   description="Discover random animals from various taxonomies and regions. Learn about different species with our interactive animal viewer."
 />
 

@@ -84,13 +84,13 @@
       } else {
         animal = animalCache.shift()!;
   
-        if (browser && confetti) {
-          confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 },
-          });
-        }
+        // if (browser && confetti) {
+        //   confetti({
+        //     particleCount: 100,
+        //     spread: 70,
+        //     origin: { y: 0.6 },
+        //   });
+        // }
   
         if (animalCache.length < 3) {
           loadAnimals();
@@ -128,7 +128,7 @@
         </button>
       </div>
       
-      <div class="mt-2">
+      <!-- <div class="mt-2">
         <button 
           on:click={showNextAnimal}
           class="btn btn-primary btn-lg w-full text-white capitalize"
@@ -140,7 +140,7 @@
           </svg>
           <span>{loading ? 'Loading...' : `Random ${taxoName}`}</span>
         </button>
-      </div>
+      </div> -->
     </div>
   
   <!-- {#if toastMessage}
