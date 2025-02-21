@@ -70,7 +70,7 @@
             </div>
         {:else if animal}
             <div class="space-y-4" transition:fade>
-                <div class="aspect-video rounded-lg overflow-hidden bg-gray-200">
+                <div class="aspect-[4/3] rounded-lg overflow-hidden bg-gray-200">
                     <img 
                         src={animal.taxon.default_photo.medium_url} 
                         alt={animal.taxon.preferred_common_name || animal.taxon.name}
